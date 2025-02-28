@@ -4,6 +4,10 @@ I've enhanced the scraper to collect multiple headlines instead of just the main
 
 I modified scrape_data_point() to accept a NUM_HEADLINES parameter, which controls the number of headlines scraped. Within scrape_data_point(), I changed soup.find() to soup.find_all(), which returns multiple instances of the element on the page that matches the query, and it has a limit parameter which I set equal to NUM_HEADLINES. Then I modified the function to return a list of headlines instead of a single string.
 
+# Schedule Cron Explanation
+
+The cron syntax "0 20 * * *" schedules a task to run at 8:00 PM / 20:00 every day. The first value (0) represents minutes, the second (20) represents hours in 24 hour format, and the three asterisks tell it to run every day, every month, and every day of week. 
+
 # Basic Git Scraper Template
 
 This template provides a starting point for **git scraping**—the technique of scraping data from websites and automatically committing it to a Git repository using workflows, [coined by Simon Willison](https://simonwillison.net/2020/Oct/9/git-scraping/).
