@@ -1,5 +1,5 @@
 """
-Scrapes a headline from The Daily Pennsylvanian website and saves it to a 
+Scrapes multiple headlines from The Daily Pennsylvanian website and saves them to a 
 JSON file that tracks headlines over time.
 """
 
@@ -13,12 +13,15 @@ import requests
 import loguru
 
 
-def scrape_data_point():
+def scrape_data_point(num_headlines=3):
     """
-    Scrapes the main headline from The Daily Pennsylvanian home page.
+    Scrapes multiple headlines from The Daily Pennsylvanian home page.
+
+    Args:
+        num_headlines (int): Number of headlines to scrape. Defaults to 3.
 
     Returns:
-        str: The headline text if found, otherwise an empty string.
+        list: A list of headline texts. Empty list if none are found.
     """
     headers = {
         "User-Agent": "cis3500-scraper"
@@ -29,13 +32,25 @@ def scrape_data_point():
 
     if req.ok:
         soup = bs4.BeautifulSoup(req.text, "html.parser")
-        target_element = soup.find("a", class_="frontpage-link")
-        data_point = "" if target_element is None else target_element.text
-        loguru.logger.info(f"Data point: {data_point}")
-        return data_point
+        target_elements = soup.find_all("a", class_="frontpage-link", limit=num_headlines)
+        
+        headlines = []
+        for element in target_elements:
+            if element is not None:
+                headlines.append(element.text.strip())
+        
+        loguru.logger.info(f"Found {len(headlines)} headlines")
+        for i, headline in enumerate(headlines):
+            loguru.logger.info(f"Headline {i+1}: {headline}")
+        
+        return headlines
+    
+    return []
 
 
 if __name__ == "__main__":
+    # Number of headlines to scrape
+    NUM_HEADLINES = 3
 
     # Setup logger to track runtime
     loguru.logger.add("scrape.log", rotation="1 day")
@@ -55,18 +70,21 @@ if __name__ == "__main__":
     )
 
     # Run scrape
-    loguru.logger.info("Starting scrape")
+    loguru.logger.info(f"Starting scrape for {NUM_HEADLINES} headlines")
     try:
-        data_point = scrape_data_point()
+        headlines = scrape_data_point(NUM_HEADLINES)
+        data_point = headlines  # Store all headlines as the data point
     except Exception as e:
-        loguru.logger.error(f"Failed to scrape data point: {e}")
+        loguru.logger.error(f"Failed to scrape data points: {e}")
         data_point = None
 
     # Save data
-    if data_point is not None:
+    if data_point is not None and len(data_point) > 0:
         dem.add_today(data_point)
         dem.save()
         loguru.logger.info("Saved daily event monitor")
+    else:
+        loguru.logger.warning("No headlines found to save")
 
     def print_tree(directory, ignore_dirs=[".git", "__pycache__"]):
         loguru.logger.info(f"Printing tree of files/dirs at {directory}")
