@@ -1,3 +1,9 @@
+# Modified The Daily Pennsylvanian Scraper with Multiple Headlines
+
+I've enhanced the scraper to collect multiple headlines instead of just the main headline, giving a more comprehensive view of The Daily Pennsylvanian's daily coverage. 
+
+I modified scrape_data_point() to accept a NUM_HEADLINES parameter, which controls the number of headlines scraped. Within scrape_data_point(), I changed soup.find() to soup.find_all(), which returns multiple instances of the element on the page that matches the query, and it has a limit parameter which I set equal to NUM_HEADLINES. Then I modified the function to return a list of headlines instead of a single string.
+
 # Basic Git Scraper Template
 
 This template provides a starting point for **git scraping**—the technique of scraping data from websites and automatically committing it to a Git repository using workflows, [coined by Simon Willison](https://simonwillison.net/2020/Oct/9/git-scraping/).
